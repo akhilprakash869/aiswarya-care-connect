@@ -44,18 +44,22 @@ const Contact = () => {
     }
 
     setIsSubmitting(true);
+    toast.loading("⏳ Sending your message...", { id: "sending" });
 
     try {
       const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
       const patientTemplateId = import.meta.env.VITE_EMAILJS_PATIENT_TEMPLATE_ID;
+      const doctorTemplateId = import.meta.env.VITE_EMAILJS_DOCTOR_TEMPLATE_ID;
       const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
-      if (!serviceId || !patientTemplateId || !publicKey) {
+      if (!serviceId || !patientTemplateId || !doctorTemplateId || !publicKey) {
+        toast.dismiss("sending");
         toast.error("❌ Email service not configured. Please add EmailJS keys.");
         setIsSubmitting(false);
         return;
       }
 
+      // Send confirmation email to patient
       await emailjs.sendForm(
         serviceId,
         patientTemplateId,
@@ -63,6 +67,15 @@ const Contact = () => {
         publicKey
       );
 
+      // Send notification email to doctor
+      await emailjs.sendForm(
+        serviceId,
+        doctorTemplateId,
+        form.current,
+        publicKey
+      );
+
+      toast.dismiss("sending");
       setIsSubmitted(true);
       toast.success("✅ Your message has been sent successfully!");
       form.current.reset();
@@ -71,7 +84,8 @@ const Contact = () => {
         setIsSubmitted(false);
       }, 3000);
     } catch (error) {
-      console.error("Error:", error);
+      toast.dismiss("sending");
+      console.error("EmailJS Error:", error);
       toast.error("❌ Failed to send. Please try again later.");
     } finally {
       setIsSubmitting(false);
