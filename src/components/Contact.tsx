@@ -17,12 +17,6 @@ const Contact = () => {
     return pattern.test(email);
   };
 
-  const validatePhone = (phone: string) => {
-    // Allow international format with + and spaces/dashes, minimum 10 digits
-    const pattern = /^[\+]?[0-9\s\-]{10,20}$/;
-    return pattern.test(phone);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -32,7 +26,6 @@ const Contact = () => {
     const email = formElements.to_email?.value;
     const name = formElements.to_name?.value;
     const message = formElements.message?.value;
-    const phone = formElements.phone?.value;
 
     // Validation
     if (!name?.trim() || !email?.trim() || !message?.trim()) {
@@ -42,11 +35,6 @@ const Contact = () => {
 
     if (!validateEmail(email)) {
       toast.error("⚠️ Please enter a valid email address");
-      return;
-    }
-
-    if (phone?.trim() && !validatePhone(phone)) {
-      toast.error("⚠️ Please enter a valid phone number (e.g., +91 98765 43210)");
       return;
     }
 
@@ -223,21 +211,6 @@ const Contact = () => {
                       required
                       disabled={isSubmitting}
                       maxLength={255}
-                      className="w-full"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="phone" className="block text-sm font-medium mb-2">
-                      Phone
-                    </label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      placeholder="+91 98765 43210 (optional)"
-                      disabled={isSubmitting}
-                      maxLength={20}
                       className="w-full"
                     />
                   </div>
