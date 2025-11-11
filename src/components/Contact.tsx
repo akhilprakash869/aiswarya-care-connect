@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Mail, Phone, MapPin, Send, CheckCircle2 } from "lucide-react";
+import { Mail, Phone, MapPin, Send, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import emailjs from '@emailjs/browser';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -14,27 +15,91 @@ const Contact = () => {
     message: "",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
-    if (!formData.name || !formData.email || !formData.message) {
+    // Enhanced validation
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
       toast.error("Please fill in all required fields");
       return;
     }
-    
-    // Here you would integrate with a backend service
-    // For now, we'll just show a success message
-    console.log("Form submitted:", formData);
-    setIsSubmitted(true);
-    toast.success("Message sent successfully!");
-    
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setFormData({ name: "", email: "", phone: "", message: "" });
-      setIsSubmitted(false);
-    }, 3000);
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    // Message length validation
+    if (formData.message.length < 10) {
+      toast.error("Please provide more details (at least 10 characters)");
+      return;
+    }
+
+    if (formData.message.length > 2000) {
+      toast.error("Message is too long (maximum 2000 characters)");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Initialize EmailJS (user needs to configure these in .env)
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID';
+      const patientTemplateId = import.meta.env.VITE_EMAILJS_PATIENT_TEMPLATE_ID || 'YOUR_PATIENT_TEMPLATE_ID';
+      const doctorTemplateId = import.meta.env.VITE_EMAILJS_DOCTOR_TEMPLATE_ID || 'YOUR_DOCTOR_TEMPLATE_ID';
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY';
+
+      // Send confirmation email to patient
+      await emailjs.send(
+        serviceId,
+        patientTemplateId,
+        {
+          to_email: formData.email,
+          to_name: formData.name,
+          from_name: 'Dr. Aiswarya Anilkumar',
+          message: 'Your health concern has been received and will be reviewed personally. Dr. Aiswarya will respond within 24-48 hours.',
+        },
+        publicKey
+      );
+
+      // Send notification email to doctor
+      await emailjs.send(
+        serviceId,
+        doctorTemplateId,
+        {
+          to_email: 'draiswaryata0108@gmail.com',
+          patient_name: formData.name,
+          patient_email: formData.email,
+          patient_phone: formData.phone || 'Not provided',
+          patient_message: formData.message,
+          submission_date: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+        },
+        publicKey
+      );
+      
+      setIsSubmitted(true);
+      toast.success("Message sent! Confirmation email sent to your inbox.");
+
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          message: "",
+        });
+      }, 3000);
+    } catch (error) {
+      console.error('Email sending failed:', error);
+      toast.error("Failed to send message. Please try again or contact directly via email/phone.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -142,6 +207,8 @@ const Contact = () => {
                       onChange={handleChange}
                       placeholder="Your full name"
                       required
+                      disabled={isSubmitting}
+                      maxLength={100}
                       className="w-full"
                     />
                   </div>
@@ -158,6 +225,8 @@ const Contact = () => {
                       onChange={handleChange}
                       placeholder="your.email@example.com"
                       required
+                      disabled={isSubmitting}
+                      maxLength={255}
                       className="w-full"
                     />
                   </div>
@@ -173,6 +242,8 @@ const Contact = () => {
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="+91 98765 43210"
+                      disabled={isSubmitting}
+                      maxLength={20}
                       className="w-full"
                     />
                   </div>
@@ -188,19 +259,32 @@ const Contact = () => {
                       onChange={handleChange}
                       placeholder="Please describe your health concern or question..."
                       required
+                      disabled={isSubmitting}
+                      maxLength={2000}
                       className="w-full min-h-[150px]"
                     />
+                    <p className="text-xs text-muted-foreground text-right mt-1">
+                      {formData.message.length}/2000 characters
+                    </p>
                   </div>
                   
                   <Button 
                     type="submit" 
                     size="lg" 
+                    disabled={isSubmitting}
                     className="w-full group transition-all hover:scale-105"
                   >
-                    <span className="flex items-center gap-2">
-                      <Send className="w-5 h-5" />
-                      Send Message
-                    </span>
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Sending...
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <Send className="w-5 h-5" />
+                        Send Message
+                      </span>
+                    )}
                   </Button>
                 </form>
               )}
