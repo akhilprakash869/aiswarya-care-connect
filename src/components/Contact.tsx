@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,9 +8,16 @@ import { Mail, Phone, MapPin, Send, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import emailjs from '@emailjs/browser';
 
+// Declare window.trackFormSubmission for TypeScript
+declare global {
+  interface Window {
+    trackFormSubmission?: () => void;
+  }
+}
+
 const Contact = () => {
+  const navigate = useNavigate();
   const form = useRef<HTMLFormElement>(null);
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateEmail = (email: string) => {
@@ -76,13 +84,18 @@ const Contact = () => {
       );
 
       toast.dismiss("sending");
-      setIsSubmitted(true);
       toast.success("✅ Your message has been sent successfully!");
       form.current.reset();
-
+      
+      // Track form submission
+      if (typeof window.trackFormSubmission === 'function') {
+        window.trackFormSubmission();
+      }
+      
+      // Navigate to success page after brief delay
       setTimeout(() => {
-        setIsSubmitted(false);
-      }, 3000);
+        navigate("/success");
+      }, 1500);
     } catch (error) {
       toast.dismiss("sending");
       console.error("EmailJS Error:", error);
@@ -172,18 +185,7 @@ const Contact = () => {
                 Ask with Confidence. Receive with Care.
               </h3>
               
-              {isSubmitted ? (
-                <div className="text-center py-12 animate-scale-in">
-                  <div className="w-20 h-20 rounded-full bg-gradient-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle2 className="w-12 h-12 text-primary" />
-                  </div>
-                  <h4 className="text-xl font-semibold mb-2">Thank you for reaching out!</h4>
-                  <p className="text-muted-foreground">
-                    Dr. Aiswarya will respond soon.
-                  </p>
-                </div>
-              ) : (
-                <form ref={form} onSubmit={handleSubmit} className="space-y-6">
+              <form ref={form} onSubmit={handleSubmit} className="space-y-6">
                   <div>
                     <label htmlFor="to_name" className="block text-sm font-medium mb-2">
                       Name <span className="text-destructive">*</span>
@@ -249,7 +251,6 @@ const Contact = () => {
                     )}
                   </Button>
                 </form>
-              )}
             </Card>
           </div>
         </div>
