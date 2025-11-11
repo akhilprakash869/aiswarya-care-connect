@@ -169,7 +169,7 @@ const Contact = () => {
                     </div>
                     <div>
                       <p className="font-medium mb-1">Location</p>
-                      <p className="text-muted-foreground">Coimbatore, Tamil Nadu</p>
+                      <p className="text-muted-foreground">Ernakulam, Kerala</p>
                     </div>
                   </div>
                 </div>
