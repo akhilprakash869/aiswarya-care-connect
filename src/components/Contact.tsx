@@ -216,6 +216,21 @@ const Contact = () => {
                   </div>
                   
                   <div>
+                    <label htmlFor="phone" className="block text-sm font-medium mb-2">
+                      Phone
+                    </label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      placeholder="+91 98765 43210 (optional)"
+                      disabled={isSubmitting}
+                      maxLength={20}
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <div>
                     <label htmlFor="message" className="block text-sm font-medium mb-2">
                       Your Message / Health Concern <span className="text-destructive">*</span>
                     </label>
