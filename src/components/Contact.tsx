@@ -47,11 +47,24 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      // Initialize EmailJS (user needs to configure these in .env)
-      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID';
-      const patientTemplateId = import.meta.env.VITE_EMAILJS_PATIENT_TEMPLATE_ID || 'YOUR_PATIENT_TEMPLATE_ID';
-      const doctorTemplateId = import.meta.env.VITE_EMAILJS_DOCTOR_TEMPLATE_ID || 'YOUR_DOCTOR_TEMPLATE_ID';
-      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY';
+      // Read EmailJS credentials from environment (must be set in project secrets)
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID as string | undefined;
+      const patientTemplateId = import.meta.env.VITE_EMAILJS_PATIENT_TEMPLATE_ID as string | undefined;
+      const doctorTemplateId = import.meta.env.VITE_EMAILJS_DOCTOR_TEMPLATE_ID as string | undefined;
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY as string | undefined;
+
+      // Guard against missing configuration
+      if (!serviceId || !patientTemplateId || !doctorTemplateId || !publicKey) {
+        console.error("EmailJS config missing:", {
+          hasServiceId: !!serviceId,
+          hasPatientTemplateId: !!patientTemplateId,
+          hasDoctorTemplateId: !!doctorTemplateId,
+          hasPublicKey: !!publicKey,
+        });
+        toast.error("Email service not configured. Please add EmailJS keys in project settings.");
+        setIsSubmitting(false);
+        return;
+      }
 
       // Send confirmation email to patient
       await emailjs.send(
