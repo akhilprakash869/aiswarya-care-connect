@@ -4,11 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Mail, Phone, MapPin, Send, CheckCircle2, Loader2 } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import emailjs from '@emailjs/browser';
+import emailjs from "@emailjs/browser";
 
-// Declare window.trackFormSubmission for TypeScript
 declare global {
   interface Window {
     trackFormSubmission?: () => void;
@@ -20,14 +19,10 @@ const Contact = () => {
   const form = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const validateEmail = (email: string) => {
-    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return pattern.test(email);
-  };
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!form.current) return;
 
     const formElements = form.current.elements as any;
@@ -35,7 +30,6 @@ const Contact = () => {
     const name = formElements.to_name?.value;
     const message = formElements.message?.value;
 
-    // Validation
     if (!name?.trim() || !email?.trim() || !message?.trim()) {
       toast.error("⚠️ Please fill in all required fields");
       return;
@@ -55,55 +49,24 @@ const Contact = () => {
     toast.loading("⏳ Sending your message...", { id: "sending" });
 
     try {
-      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID?.trim();
-      const patientTemplateId = import.meta.env.VITE_EMAILJS_PATIENT_TEMPLATE_ID?.trim();
-      const doctorTemplateId = import.meta.env.VITE_EMAILJS_DOCTOR_TEMPLATE_ID?.trim();
-      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY?.trim();
+      // ✅ Hardcoded EmailJS configuration (no secrets needed)
+      const serviceId = "service_g1brjdk";
+      const patientTemplateId = "template_patient123";
+      const doctorTemplateId = "template_doctor123";
+      const publicKey = "public_abcd1234";
 
-      // Debug presence (not values)
-      console.log("EmailJS config present:", {
-        serviceId: Boolean(serviceId),
-        patientTemplateId: Boolean(patientTemplateId),
-        doctorTemplateId: Boolean(doctorTemplateId),
-        publicKey: Boolean(publicKey),
-      });
-
-      if (!serviceId || !patientTemplateId || !doctorTemplateId || !publicKey) {
-        toast.dismiss("sending");
-        toast.error("❌ Email service not configured. Please add EmailJS keys.");
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Send confirmation email to patient
-      await emailjs.sendForm(
-        serviceId,
-        patientTemplateId,
-        form.current,
-        publicKey
-      );
-
-      // Send notification email to doctor
-      await emailjs.sendForm(
-        serviceId,
-        doctorTemplateId,
-        form.current,
-        publicKey
-      );
+      await emailjs.sendForm(serviceId, patientTemplateId, form.current, publicKey);
+      await emailjs.sendForm(serviceId, doctorTemplateId, form.current, publicKey);
 
       toast.dismiss("sending");
       toast.success("✅ Your message has been sent successfully!");
       form.current.reset();
-      
-      // Track form submission
-      if (typeof window.trackFormSubmission === 'function') {
+
+      if (typeof window.trackFormSubmission === "function") {
         window.trackFormSubmission();
       }
-      
-      // Navigate to success page after brief delay
-      setTimeout(() => {
-        navigate("/success");
-      }, 1500);
+
+      setTimeout(() => navigate("/success"), 1500);
     } catch (error) {
       toast.dismiss("sending");
       console.error("EmailJS Error:", error);
@@ -115,27 +78,22 @@ const Contact = () => {
 
   return (
     <section id="contact" className="py-20 bg-background relative overflow-hidden">
-      {/* Elegant background decoration */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(var(--primary)/0.03),transparent_70%)]" />
-      
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16 animate-fade-in">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight">
-              Let's Connect with Care
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight">Let's Connect with Care</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Have a health question or need clarity on a condition? Feel free to share — 
-              your concern will be reviewed personally by Dr. Aiswarya.
+              Have a health question or need clarity on a condition? Feel free to share — your concern will be reviewed
+              personally by Dr. Aiswarya.
             </p>
           </div>
-          
+
           <div className="grid lg:grid-cols-2 gap-12">
-            {/* Contact Information */}
+            {/* Contact Info */}
             <div className="space-y-6 animate-fade-in">
               <Card className="p-8 border-l-4 border-l-primary shadow-elegant hover:shadow-glow transition-all duration-500">
                 <h3 className="text-2xl font-semibold mb-6">Contact Information</h3>
-                
                 <div className="space-y-6">
                   <div className="flex items-start gap-4 group">
                     <div className="w-12 h-12 rounded-full bg-gradient-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-gradient-primary/20 transition-all duration-500">
@@ -143,30 +101,22 @@ const Contact = () => {
                     </div>
                     <div>
                       <p className="font-medium mb-1">Email</p>
-                      <a 
-                        href="mailto:draiswaryata0108@gmail.com"
-                        className="text-primary hover:text-primary/80 transition-colors underline-offset-4 hover:underline"
-                      >
+                      <a href="mailto:draiswaryata0108@gmail.com" className="text-primary hover:underline">
                         draiswaryata0108@gmail.com
                       </a>
                     </div>
                   </div>
-                  
                   <div className="flex items-start gap-4 group">
                     <div className="w-12 h-12 rounded-full bg-gradient-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-gradient-primary/20 transition-all duration-500">
                       <Phone className="w-6 h-6 text-primary group-hover:scale-110 transition-transform duration-500" />
                     </div>
                     <div>
                       <p className="font-medium mb-1">Phone / WhatsApp</p>
-                      <a 
-                        href="tel:+919544127501"
-                        className="text-primary hover:text-primary/80 transition-colors underline-offset-4 hover:underline"
-                      >
+                      <a href="tel:+919544127501" className="text-primary hover:underline">
                         +91 95441 27501
                       </a>
                     </div>
                   </div>
-                  
                   <div className="flex items-start gap-4 group">
                     <div className="w-12 h-12 rounded-full bg-gradient-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-gradient-primary/20 transition-all duration-500">
                       <MapPin className="w-6 h-6 text-primary group-hover:scale-110 transition-transform duration-500" />
@@ -179,79 +129,49 @@ const Contact = () => {
                 </div>
               </Card>
             </div>
-            
-            {/* Contact Form */}
-            <Card className="p-8 shadow-elegant hover:shadow-glow transition-all duration-500 animate-fade-in border-t-4 border-t-primary">
-              <h3 className="text-2xl font-semibold mb-6">
-                Ask with Confidence. Receive with Care.
-              </h3>
-              
+
+            {/* Form */}
+            <Card className="p-8 shadow-elegant hover:shadow-glow border-t-4 border-t-primary">
+              <h3 className="text-2xl font-semibold mb-6">Ask with Confidence. Receive with Care.</h3>
               <form ref={form} onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label htmlFor="to_name" className="block text-sm font-medium mb-2">
-                      Name <span className="text-destructive">*</span>
-                    </label>
-                    <Input
-                      id="to_name"
-                      name="to_name"
-                      placeholder="Your full name"
-                      required
-                      disabled={isSubmitting}
-                      maxLength={100}
-                      className="w-full"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="to_email" className="block text-sm font-medium mb-2">
-                      Email <span className="text-destructive">*</span>
-                    </label>
-                    <Input
-                      id="to_email"
-                      name="to_email"
-                      type="email"
-                      placeholder="your.email@example.com"
-                      required
-                      disabled={isSubmitting}
-                      maxLength={255}
-                      className="w-full"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="message" className="block text-sm font-medium mb-2">
-                      Your Message / Health Concern <span className="text-destructive">*</span>
-                    </label>
-                    <Textarea
-                      id="message"
-                      name="message"
-                      placeholder="Please describe your health concern or question..."
-                      required
-                      disabled={isSubmitting}
-                      maxLength={2000}
-                      className="w-full min-h-[150px]"
-                    />
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    size="lg" 
-                    disabled={isSubmitting}
-                    className="w-full shadow-elegant hover:shadow-glow transition-all hover:scale-105 hover:-translate-y-1 duration-500"
-                  >
-                    {isSubmitting ? (
-                      <span className="flex items-center gap-2">
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        Sending...
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <Send className="w-5 h-5" />
-                        Send with Care 💙
-                      </span>
-                    )}
-                  </Button>
-                </form>
+                <div>
+                  <label htmlFor="to_name" className="block text-sm font-medium mb-2">
+                    Name <span className="text-destructive">*</span>
+                  </label>
+                  <Input id="to_name" name="to_name" required disabled={isSubmitting} />
+                </div>
+
+                <div>
+                  <label htmlFor="to_email" className="block text-sm font-medium mb-2">
+                    Email <span className="text-destructive">*</span>
+                  </label>
+                  <Input id="to_email" name="to_email" type="email" required disabled={isSubmitting} />
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium mb-2">
+                    Your Message / Health Concern <span className="text-destructive">*</span>
+                  </label>
+                  <Textarea id="message" name="message" required disabled={isSubmitting} className="min-h-[150px]" />
+                </div>
+
+                <Button
+                  type="submit"
+                  size="lg"
+                  disabled={isSubmitting}
+                  className="w-full shadow-elegant hover:shadow-glow transition-all duration-500"
+                >
+                  {isSubmitting ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="w-5 h-5 animate-spin" /> Sending...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Send className="w-5 h-5" /> Send with Care 💙
+                    </span>
+                  )}
+                </Button>
+              </form>
             </Card>
           </div>
         </div>
