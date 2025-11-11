@@ -110,11 +110,14 @@ const Contact = () => {
   };
 
   return (
-    <section id="contact" className="py-20 bg-background">
-      <div className="container mx-auto px-4">
+    <section id="contact" className="py-20 bg-background relative overflow-hidden">
+      {/* Elegant background decoration */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(var(--primary)/0.03),transparent_70%)]" />
+      
+      <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <div className="text-center mb-16 animate-fade-in">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight">
               Let's Connect with Care
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -125,44 +128,44 @@ const Contact = () => {
           
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Contact Information */}
-            <div className="space-y-6">
-              <Card className="p-8 border-l-4 border-l-primary shadow-lg">
+            <div className="space-y-6 animate-fade-in">
+              <Card className="p-8 border-l-4 border-l-primary shadow-elegant hover:shadow-glow transition-all duration-500">
                 <h3 className="text-2xl font-semibold mb-6">Contact Information</h3>
                 
                 <div className="space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <Mail className="w-6 h-6 text-primary" />
+                  <div className="flex items-start gap-4 group">
+                    <div className="w-12 h-12 rounded-full bg-gradient-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-gradient-primary/20 transition-all duration-500">
+                      <Mail className="w-6 h-6 text-primary group-hover:scale-110 transition-transform duration-500" />
                     </div>
                     <div>
                       <p className="font-medium mb-1">Email</p>
                       <a 
                         href="mailto:draiswaryata0108@gmail.com"
-                        className="text-primary hover:underline"
+                        className="text-primary hover:text-primary/80 transition-colors underline-offset-4 hover:underline"
                       >
                         draiswaryata0108@gmail.com
                       </a>
                     </div>
                   </div>
                   
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <Phone className="w-6 h-6 text-primary" />
+                  <div className="flex items-start gap-4 group">
+                    <div className="w-12 h-12 rounded-full bg-gradient-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-gradient-primary/20 transition-all duration-500">
+                      <Phone className="w-6 h-6 text-primary group-hover:scale-110 transition-transform duration-500" />
                     </div>
                     <div>
                       <p className="font-medium mb-1">Phone / WhatsApp</p>
                       <a 
                         href="tel:+919544127501"
-                        className="text-primary hover:underline"
+                        className="text-primary hover:text-primary/80 transition-colors underline-offset-4 hover:underline"
                       >
                         +91 95441 27501
                       </a>
                     </div>
                   </div>
                   
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <MapPin className="w-6 h-6 text-primary" />
+                  <div className="flex items-start gap-4 group">
+                    <div className="w-12 h-12 rounded-full bg-gradient-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-gradient-primary/20 transition-all duration-500">
+                      <MapPin className="w-6 h-6 text-primary group-hover:scale-110 transition-transform duration-500" />
                     </div>
                     <div>
                       <p className="font-medium mb-1">Location</p>
@@ -172,7 +175,7 @@ const Contact = () => {
                 </div>
               </Card>
               
-              <div className="p-6 bg-secondary/50 rounded-lg border border-border">
+              <div className="p-6 bg-gradient-primary/5 rounded-xl border border-primary/20 shadow-soft backdrop-blur-sm">
                 <p className="text-sm text-muted-foreground italic flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
                   Your message remains private and confidential
@@ -181,14 +184,16 @@ const Contact = () => {
             </div>
             
             {/* Contact Form */}
-            <Card className="p-8 shadow-xl">
+            <Card className="p-8 shadow-elegant hover:shadow-glow transition-all duration-500 animate-fade-in border-t-4 border-t-primary">
               <h3 className="text-2xl font-semibold mb-6">
                 Ask with Confidence. Receive with Care.
               </h3>
               
               {isSubmitted ? (
-                <div className="text-center py-12">
-                  <CheckCircle2 className="w-16 h-16 text-primary mx-auto mb-4" />
+                <div className="text-center py-12 animate-scale-in">
+                  <div className="w-20 h-20 rounded-full bg-gradient-primary/10 flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle2 className="w-12 h-12 text-primary" />
+                  </div>
                   <h4 className="text-xl font-semibold mb-2">Thank you for reaching out!</h4>
                   <p className="text-muted-foreground">
                     Dr. Aiswarya will respond soon.
@@ -272,7 +277,7 @@ const Contact = () => {
                     type="submit" 
                     size="lg" 
                     disabled={isSubmitting}
-                    className="w-full group transition-all hover:scale-105"
+                    className="w-full shadow-elegant hover:shadow-glow transition-all hover:scale-105 hover:-translate-y-1 duration-500"
                   >
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">
@@ -281,7 +286,7 @@ const Contact = () => {
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
-                        <Send className="w-5 h-5" />
+                        <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                         Send Message
                       </span>
                     )}

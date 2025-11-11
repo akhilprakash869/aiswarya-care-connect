@@ -23,8 +23,13 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        "medical-blue": "hsl(var(--medical-blue))",
+        "medical-blue": {
+          DEFAULT: "hsl(var(--medical-blue))",
+          light: "hsl(var(--medical-blue-light))",
+          dark: "hsl(var(--medical-blue-dark))",
+        },
         "soft-black": "hsl(var(--soft-black))",
+        "elegant-black": "hsl(var(--elegant-black))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -63,6 +68,17 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      backgroundImage: {
+        'gradient-primary': 'var(--gradient-primary)',
+        'gradient-dark': 'var(--gradient-dark)',
+        'gradient-elegant': 'var(--gradient-elegant)',
+        'gradient-subtle': 'var(--gradient-subtle)',
+      },
+      boxShadow: {
+        'elegant': 'var(--shadow-elegant)',
+        'glow': 'var(--shadow-glow)',
+        'soft': 'var(--shadow-soft)',
       },
       borderRadius: {
         lg: "var(--radius)",
