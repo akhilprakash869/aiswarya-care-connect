@@ -55,10 +55,18 @@ const Contact = () => {
     toast.loading("⏳ Sending your message...", { id: "sending" });
 
     try {
-      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-      const patientTemplateId = import.meta.env.VITE_EMAILJS_PATIENT_TEMPLATE_ID;
-      const doctorTemplateId = import.meta.env.VITE_EMAILJS_DOCTOR_TEMPLATE_ID;
-      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID?.trim();
+      const patientTemplateId = import.meta.env.VITE_EMAILJS_PATIENT_TEMPLATE_ID?.trim();
+      const doctorTemplateId = import.meta.env.VITE_EMAILJS_DOCTOR_TEMPLATE_ID?.trim();
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY?.trim();
+
+      // Debug presence (not values)
+      console.log("EmailJS config present:", {
+        serviceId: Boolean(serviceId),
+        patientTemplateId: Boolean(patientTemplateId),
+        doctorTemplateId: Boolean(doctorTemplateId),
+        publicKey: Boolean(publicKey),
+      });
 
       if (!serviceId || !patientTemplateId || !doctorTemplateId || !publicKey) {
         toast.dismiss("sending");
