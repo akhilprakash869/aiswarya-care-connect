@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,118 +8,74 @@ import { toast } from "sonner";
 import emailjs from '@emailjs/browser';
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
+  const form = useRef<HTMLFormElement>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validateEmail = (email: string) => {
+    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return pattern.test(email);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Enhanced validation
-    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
-      toast.error("Please fill in all required fields");
+    if (!form.current) return;
+
+    const formElements = form.current.elements as any;
+    const email = formElements.to_email?.value;
+    const name = formElements.to_name?.value;
+    const message = formElements.message?.value;
+
+    // Validation
+    if (!name?.trim() || !email?.trim() || !message?.trim()) {
+      toast.error("⚠️ Please fill in all required fields");
       return;
     }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error("Please enter a valid email address");
+    if (!validateEmail(email)) {
+      toast.error("⚠️ Please enter a valid email address");
       return;
     }
 
-    // Message length validation
-    if (formData.message.length < 10) {
-      toast.error("Please provide more details (at least 10 characters)");
-      return;
-    }
-
-    if (formData.message.length > 2000) {
-      toast.error("Message is too long (maximum 2000 characters)");
+    if (message.length < 10) {
+      toast.error("⚠️ Please provide more details (at least 10 characters)");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Read EmailJS credentials from environment (must be set in project secrets)
-      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID as string | undefined;
-      const patientTemplateId = import.meta.env.VITE_EMAILJS_PATIENT_TEMPLATE_ID as string | undefined;
-      const doctorTemplateId = import.meta.env.VITE_EMAILJS_DOCTOR_TEMPLATE_ID as string | undefined;
-      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY as string | undefined;
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+      const patientTemplateId = import.meta.env.VITE_EMAILJS_PATIENT_TEMPLATE_ID;
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
-      // Guard against missing configuration
-      if (!serviceId || !patientTemplateId || !doctorTemplateId || !publicKey) {
-        console.error("EmailJS config missing:", {
-          hasServiceId: !!serviceId,
-          hasPatientTemplateId: !!patientTemplateId,
-          hasDoctorTemplateId: !!doctorTemplateId,
-          hasPublicKey: !!publicKey,
-        });
-        toast.error("Email service not configured. Please add EmailJS keys in project settings.");
+      if (!serviceId || !patientTemplateId || !publicKey) {
+        toast.error("❌ Email service not configured. Please add EmailJS keys.");
         setIsSubmitting(false);
         return;
       }
 
-      // Send confirmation email to patient
-      await emailjs.send(
+      await emailjs.sendForm(
         serviceId,
         patientTemplateId,
-        {
-          to_email: formData.email,
-          to_name: formData.name,
-          from_name: 'Dr. Aiswarya Anilkumar',
-          message: 'Your health concern has been received and will be reviewed personally. Dr. Aiswarya will respond within 24-48 hours.',
-        },
+        form.current,
         publicKey
       );
 
-      // Send notification email to doctor
-      await emailjs.send(
-        serviceId,
-        doctorTemplateId,
-        {
-          to_email: 'draiswaryata0108@gmail.com',
-          patient_name: formData.name,
-          patient_email: formData.email,
-          patient_phone: formData.phone || 'Not provided',
-          patient_message: formData.message,
-          submission_date: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
-        },
-        publicKey
-      );
-      
       setIsSubmitted(true);
-      toast.success("Message sent! Confirmation email sent to your inbox.");
+      toast.success("✅ Your message has been sent successfully!");
+      form.current.reset();
 
-      // Reset form after 3 seconds
       setTimeout(() => {
         setIsSubmitted(false);
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          message: "",
-        });
       }, 3000);
     } catch (error) {
-      console.error('Email sending failed:', error);
-      toast.error("Failed to send message. Please try again or contact directly via email/phone.");
+      console.error("Error:", error);
+      toast.error("❌ Failed to send. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
   };
 
   return (
@@ -213,16 +169,14 @@ const Contact = () => {
                   </p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form ref={form} onSubmit={handleSubmit} className="space-y-6">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium mb-2">
+                    <label htmlFor="to_name" className="block text-sm font-medium mb-2">
                       Name <span className="text-destructive">*</span>
                     </label>
                     <Input
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
+                      id="to_name"
+                      name="to_name"
                       placeholder="Your full name"
                       required
                       disabled={isSubmitting}
@@ -232,36 +186,17 @@ const Contact = () => {
                   </div>
                   
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium mb-2">
+                    <label htmlFor="to_email" className="block text-sm font-medium mb-2">
                       Email <span className="text-destructive">*</span>
                     </label>
                     <Input
-                      id="email"
-                      name="email"
+                      id="to_email"
+                      name="to_email"
                       type="email"
-                      value={formData.email}
-                      onChange={handleChange}
                       placeholder="your.email@example.com"
                       required
                       disabled={isSubmitting}
                       maxLength={255}
-                      className="w-full"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="phone" className="block text-sm font-medium mb-2">
-                      Phone (Optional)
-                    </label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      placeholder="+91 98765 43210"
-                      disabled={isSubmitting}
-                      maxLength={20}
                       className="w-full"
                     />
                   </div>
@@ -273,17 +208,12 @@ const Contact = () => {
                     <Textarea
                       id="message"
                       name="message"
-                      value={formData.message}
-                      onChange={handleChange}
                       placeholder="Please describe your health concern or question..."
                       required
                       disabled={isSubmitting}
                       maxLength={2000}
                       className="w-full min-h-[150px]"
                     />
-                    <p className="text-xs text-muted-foreground text-right mt-1">
-                      {formData.message.length}/2000 characters
-                    </p>
                   </div>
                   
                   <Button 
@@ -299,8 +229,8 @@ const Contact = () => {
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
-                        <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                        Send Message
+                        <Send className="w-5 h-5" />
+                        Send with Care 💙
                       </span>
                     )}
                   </Button>
