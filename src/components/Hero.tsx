@@ -10,9 +10,28 @@ const Hero = () => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-subtle pt-16">
-      {/* Elegant background effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(var(--primary)/0.08),transparent_60%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,hsl(var(--medical-blue-light)/0.06),transparent_60%)]" />
+      {/* Animated gradient backgrounds */}
+      <div className="absolute inset-0 bg-gradient-primary opacity-20 animate-pulse" style={{ animationDuration: '8s' }} />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(var(--primary)/0.15),transparent_50%)] animate-[pulse_6s_ease-in-out_infinite]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,hsl(var(--medical-blue-light)/0.12),transparent_50%)] animate-[pulse_7s_ease-in-out_infinite]" />
+      
+      {/* Floating particles */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full bg-primary/10 animate-float"
+            style={{
+              width: `${Math.random() * 80 + 20}px`,
+              height: `${Math.random() * 80 + 20}px`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 8}s`,
+              animationDuration: `${Math.random() * 10 + 15}s`,
+            }}
+          />
+        ))}
+      </div>
       
       <div className="container mx-auto px-4 py-20 relative z-10">
         <div className="grid lg:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
