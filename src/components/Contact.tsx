@@ -170,13 +170,6 @@ const Contact = () => {
                   </div>
                 </div>
               </Card>
-              
-              <div className="p-6 bg-gradient-primary/5 rounded-xl border border-primary/20 shadow-soft backdrop-blur-sm">
-                <p className="text-sm text-muted-foreground italic flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
-                  Your message remains private and confidential
-                </p>
-              </div>
             </div>
             
             {/* Contact Form */}
