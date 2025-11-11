@@ -6,7 +6,7 @@ const About = () => {
     {
       icon: GraduationCap,
       title: "MBBS",
-      institution: "ESI Medical College, Ernakulam",
+      institution: "ESI Medical College, Coimbatore",
       description: "Graduated with comprehensive medical education",
     },
     {
@@ -38,7 +38,7 @@ const About = () => {
             <div className="space-y-6 animate-fade-in">
               <Card className="p-8 border-l-4 border-l-primary shadow-elegant hover:shadow-glow transition-all duration-500">
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  MBBS graduate from <span className="font-semibold text-foreground">ESI Medical College, Ernakulam</span>.
+                  MBBS graduate from <span className="font-semibold text-foreground">ESI Medical College, Coimbatore</span>.
                 </p>
                 <p className="text-lg text-muted-foreground leading-relaxed mt-4">
                   Passionate about <span className="font-semibold text-primary">preventive medicine</span>, 
