@@ -3,15 +3,21 @@ import About from "@/components/About";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import ThemeToggle from "@/components/ThemeToggle";
+import Navigation from "@/components/Navigation";
 
 const Index = () => {
   return (
     <div className="min-h-screen">
-      <ThemeToggle />
-      <Hero />
-      <About />
-      <Contact />
+      <Navigation />
+      <div id="hero">
+        <Hero />
+      </div>
+      <div id="about">
+        <About />
+      </div>
+      <div id="contact">
+        <Contact />
+      </div>
       <Footer />
       <WhatsAppButton />
     </div>
